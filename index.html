@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda Online</title>
+    <link rel="stylesheet" href="Estilos/estilos.css">
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <h1>Tienda Online</h1>
+        <div class="carrito-icono" onclick="toggleCarrito()">
+            🛒 <span id="cantCarrito">0</span>
+        </div>
+    </header>
+
+    <!-- LISTA DE PRODUCTOS -->
+    <section class="productos" id="listaProductos">
+        <!-- Productos generados por JavaScript -->
+    </section>
+
+    <!-- MODAL PRODUCTO -->
+    <div id="modalProducto" class="modal">
+        <div class="modal-contenido">
+            <span class="cerrar" onclick="cerrarModal()">&times;</span>
+            <img id="modalImg">
+            <h2 id="modalTitulo"></h2>
+            <p id="modalDesc"></p>
+            <p class="precio" id="modalPrecio"></p>
+            <button onclick="agregarCarrito()">Agregar al carrito</button>
+        </div>
+    </div>
+
+    <!-- CARRITO -->
+    <div id="carrito" class="carrito">
+        <h2>Carrito</h2>
+        <ul id="listaCarrito"></ul>
+        <p id="totalCarrito"></p>
+    </div>
+
+    <!-- SCRIPT -->
+    <script>
+        // --------------------- PRODUCTOS ---------------------
+        const productos = [
+    { id:1, titulo:"Mouse Gamer RGB", precio:45000, img:"imagenes/producto1.jpeg", desc:"Utiliza cable Posee rueda de desplazamiento Cuenta con 6 botones para un mayor control Con luces para mejorar la experiencia de uso Alcance máximo de 1,8 m Con sensor óptico. Resolución de 7200dpi  " },
+    { id:2, titulo:"Teclado Mecánico", precio:190000,  img:"imagenes/producto2.webp", desc:"Resiste a salpicaduras.Función antighosting incorporada. Tipo de teclado: mecánico. Tecla cilíndrica. Con conector USB. Medidas: 37.5cm de ancho, 15.5cm de alto y 4.3cm de profundidad." },
+    { id:3, titulo:"Audífonos Bluetooth", precio:85000, img:"imagenes/producto3.webp", desc:"Cantidad de pares: 1.Cuenta con tecnología True Wireless. Alcance inalámbrico de 10 m. Modo manos libres incluido. Con estuche de carga." },
+    { id:4, titulo:"Cargador Rápido 25W", precio:30000, img:"imagenes/producto4.webp", desc:"Cargador USB-C super fast." },
+    { id:5, titulo:"Smartwatch Deportivo", precio:140000, img:"imagenes/producto5.webp", desc:"Monitoreo cardíaco y pasos." },
+    { id:6, titulo:"Parlante Bluetooth", precio:60000, img:"imagenes/producto6.webp", desc:"Sonido potente resistente al agua." },
+    { id:7, titulo:"Memoria USB 64GB", precio:25000, img:"imagenes/producto7.webp", desc:"USB 3.0 alta velocidad." },
+    { id:8, titulo:"Cámara Web HD", precio:70000, img:"imagenes/producto8.webp", desc:"Cámara web 1080p." },
+    { id:9, titulo:"Base para Laptop", precio:40000, img:"imagenes/producto9.webp", desc:"Base ajustable plegable." },
+    { id:10, titulo:"Disco Duro 1TB", precio:210000, img:"imagenes/producto10.webp", desc:"Disco duro USB 3.0." },
+
+    { id:11, titulo:"Router WiFi 5", precio:90000, img:"imagenes/producto11.webp", desc:"Doble banda, alta cobertura." },
+    { id:12, titulo:"Silla Gamer", precio:350000, img:"imagenes/producto12.webp", desc:"Silla ergonómica reclinable." },
+    { id:13, titulo:"Tarjeta SD 128GB", precio:50000, img:"imagenes/producto13.webp", desc:"Clase 10, alta velocidad." },
+    { id:14, titulo:"Teclado Inalámbrico", precio:45000, img:"imagenes/producto14.webp", desc:"Conexión bluetooth estable." },
+    { id:15, titulo:"Monitor 24 pulgadas", precio:460000, img:"imagenes/producto15.webp", desc:"1080p, 75Hz." },
+    { id:16, titulo:"Mini Proyector LED", precio:230000, img:"imagenes/producto16.webp", desc:"Proyector portátil HD." },
+    { id:17, titulo:"Soporte de Celular", precio:15000, img:"imagenes/producto17.webp", desc:"Flexible y ajustable." },
+    { id:18, titulo:"Cámara de Seguridad", precio:90000, img:"imagenes/producto18.webp", desc:"WiFi visión nocturna." },
+    { id:19, titulo:"Batería Portátil 10000mAh", precio:60000, img:"imagenes/producto19.webp", desc:"Cargador portátil rápido." },
+    { id:20, titulo:"Cable USB-C", precio:12000, img:"imagenes/producto20.webp", desc:"Cable reforzado 1 metro." },
+    { id:21, titulo:"Tablet 10 pulgadas", precio:380000, img:"imagenes/producto21.webp", desc:"Android 10, 4GB RAM." },
+    { id:22, titulo:"Laptop Gamer ", precio:2300000, img:"imagenes/producto22.webp", desc:"SSD 512GB, 8GB RAM." },
+    { id:23, titulo:"Audífonos Pro Studio", precio:160000, img:"imagenes/producto23.webp", desc:"Alta calidad de sonido." },
+    { id:24, titulo:"Smart TV 50\"", precio:1290000, img:"imagenes/producto24.webp", desc:"4K UHD conectado." },
+    { id:25, titulo:"Control Bluetooth", precio:45000, img:"imagenes/producto25.webp", desc:"Control para videojuegos." }
+];
+
+        const listaProductos = document.getElementById("listaProductos");
+        const modal = document.getElementById("modalProducto");
+        let productoActual = null;
+
+        // Renderizar productos
+        productos.forEach(p => {
+            listaProductos.innerHTML += `
+                <div class="producto" onclick="abrirModal(${p.id})">
+                    <img src="${p.img}">
+                    <h3>${p.titulo}</h3>
+                    <p>$${p.precio.toLocaleString()}</p>
+                </div>
+            `;
+        });
+
+        // Modal Producto
+        function abrirModal(id) {
+            productoActual = productos.find(p => p.id === id);
+            document.getElementById("modalImg").src = productoActual.img;
+            document.getElementById("modalTitulo").innerText = productoActual.titulo;
+            document.getElementById("modalDesc").innerText = productoActual.desc;
+            document.getElementById("modalPrecio").innerText = "$" + productoActual.precio.toLocaleString();
+            modal.style.display = "block";
+        }
+
+        function cerrarModal() {
+            modal.style.display = "none";
+        }
+
+        // --------------------- CARRITO ---------------------
+        let carrito = [];
+
+        function agregarCarrito() {
+            carrito.push(productoActual);
+            actualizarCarrito();
+            cerrarModal();
+        }
+
+        function actualizarCarrito() {
+            const lista = document.getElementById("listaCarrito");
+            lista.innerHTML = "";
+            carrito.forEach((p, i) => {
+                lista.innerHTML += `
+                    <li>
+                        ${p.titulo} - $${p.precio.toLocaleString()}
+                        <button onclick="eliminarItem(${i})">X</button>
+                    </li>`;
+            });
+
+            document.getElementById("cantCarrito").innerText = carrito.length;
+
+            let total = carrito.reduce((s, p) => s + p.precio, 0);
+            document.getElementById("totalCarrito").innerText = "Total: $" + total.toLocaleString();
+        }
+
+        function eliminarItem(i) {
+            carrito.splice(i, 1);
+            actualizarCarrito();
+        }
+
+        function toggleCarrito() {
+            const c = document.getElementById("carrito");
+            c.style.display = (c.style.display === "block" ? "none" : "block");
+        }
+    </script>
+
+</body>
+</html>
